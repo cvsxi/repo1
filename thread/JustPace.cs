@@ -9,22 +9,24 @@ namespace thread
 {
     public static class JustPace
     {
-        static object locker = new();
+        static Semaphore sem = new Semaphore(3, 3);
+        static Thread myThread;
+        static int count = 3;
         public static void justpace()
         {
-            Pacing pacing = new Pacing();
-            pacing.Pace();
-            Console.WriteLine($"{Thread.CurrentThread.Name}  :  крокує до мосту");
-            bool acquiredLock = false;
-            try
+            while (count>0 )
             {
-                Monitor.Enter(locker, ref acquiredLock);
+                sem.WaitOne();
+                Pacing pacing = new Pacing();
+                pacing.Pace();
+                Console.WriteLine($"{Thread.CurrentThread.Name}  :  крокує до мосту");
+                
+
+               
                 Console.WriteLine($"{Thread.CurrentThread.Name} :  йде через мiст");
                 pacing.Pace();
-            }
-            finally
-            {
-                if (acquiredLock) Monitor.Exit(locker);
+                sem.Release();
+                count--;
             }
 
 
